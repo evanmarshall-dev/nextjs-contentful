@@ -1,4 +1,7 @@
 import { createClient } from "contentful";
+import Image from "next/image";
+import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+import RecipeDetailStyles from "../../components/RecipeDetails.module.css";
 
 // Not inside FXN this time because it will be used in two separate FXNs on the slug.js versus index/js.
 const client = createClient({
@@ -43,6 +46,33 @@ export const getStaticProps = async ({ params }) => {
 };
 
 export default function RecipeDetails({ recipe }) {
+  const { featuredImage, title, cookingTime, ingredients, method } =
+    recipe.fields;
+
   // console.log(recipe);
-  return <div>Recipe Details</div>;
+  return (
+    <div>
+      <div className={RecipeDetailStyles.banner}>
+        <Image
+          src={"https:" + featuredImage.fields.file.url}
+          width={featuredImage.fields.file.details.image.width}
+          height={featuredImage.fields.file.details.image.height}
+        />
+        <h2>{title}</h2>
+      </div>
+      <div className={RecipeDetailStyles.info}>
+        <p>Takes about {cookingTime} mins to cook</p>
+        <h3>Ingredients:</h3>
+
+        {ingredients.map((ing) => (
+          <span key={ing}>{ing}</span>
+        ))}
+      </div>
+
+      <div className="method">
+        <h3>Method:</h3>
+        <div>{documentToReactComponents(method)}</div>
+      </div>
+    </div>
+  );
 }
