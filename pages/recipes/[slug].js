@@ -42,6 +42,8 @@ export const getStaticProps = async ({ params }) => {
   return {
     // Passing in first item inside the array [0].
     props: { recipe: items[0] },
+    // Revalidate is in seconds and how often nextjs can look for content updates and regenerate a page.
+    revalidate: 1,
   };
 };
 

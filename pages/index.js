@@ -27,6 +27,7 @@ export async function getStaticProps() {
       // res.items is all of the items we get back from the above getEntries FXN.
       recipes: res.items,
     },
+    revalidate: 1,
   };
 }
 
