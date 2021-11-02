@@ -2,6 +2,7 @@ import { createClient } from "contentful";
 import Image from "next/image";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import RecipeDetailStyles from "../../components/RecipeDetails.module.css";
+import Skeleton from "../../components/Skeleton/Skeleton";
 
 // Not inside FXN this time because it will be used in two separate FXNs on the slug.js versus index/js.
 const client = createClient({
@@ -26,7 +27,9 @@ export const getStaticPaths = async () => {
 
   return {
     paths,
-    fallback: false,
+    // Change fallback to true so that we can update the site with a fallback page while nextjs creates a new static page from contentful data.
+    // Once it gets the updated data from re-running get static props FXN then injects into the component.
+    fallback: true,
   };
 };
 
@@ -43,11 +46,16 @@ export const getStaticProps = async ({ params }) => {
     // Passing in first item inside the array [0].
     props: { recipe: items[0] },
     // Revalidate is in seconds and how often nextjs can look for content updates and regenerate a page.
+    // NOTE: Incremental Static Regeneration (ISR) only regenerates pages which already exist so the homepage would load a new added recipe, but there would be no details page for it.
     revalidate: 1,
   };
 };
 
 export default function RecipeDetails({ recipe }) {
+  // Use the if statement to render Skeleton in div on page instead of 404 when there is no recipe.
+  // Once it has the updated data it no longer shows skeleton content and renders all below component code for the details page.
+  if (!recipe) return <Skeleton />;
+
   const { featuredImage, title, cookingTime, ingredients, method } =
     recipe.fields;
 
