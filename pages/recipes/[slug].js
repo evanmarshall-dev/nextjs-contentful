@@ -34,6 +34,8 @@ export const getStaticPaths = async () => {
 };
 
 // We just want one recipe and we get this by the prop passed into getStaticProps of context which has property of slug
+// We want to redirect user from skeleton page to 404 when there is no slug.
+// The below items prop is an array with a length. If there is no page then the length would be 0.
 export const getStaticProps = async ({ params }) => {
   // fetch single item/recipe based on page we are on
   const { items } = await client.getEntries({
@@ -41,6 +43,17 @@ export const getStaticProps = async ({ params }) => {
     // Second prop added to get singular recipe. We know slug field is unique so it will only receive one that matches params.slug.
     "fields.slug": params.slug,
   });
+
+  // This if statement will determine if items has length.
+  // If the items does not have length then we pass in redirect prop with destination of homepage and make it so that it is NOT a permanent redirect.
+  if (!items.length) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
 
   return {
     // Passing in first item inside the array [0].
